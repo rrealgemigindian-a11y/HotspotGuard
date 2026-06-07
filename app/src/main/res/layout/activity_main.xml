@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="#0D1117">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🛡️ HotspotGuard"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="#58A6FF"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hotspot Auto-Restart App"
+        android:textSize="14sp"
+        android:textColor="#8B949E"
+        android:layout_marginBottom="40dp" />
+
+    <!-- Status Card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#161B22"
+        android:padding="20dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔴 Guard Inactive"
+            android:textSize="16sp"
+            android:textColor="#F0F6FC"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvHotspotStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📡 Hotspot: OFF"
+            android:textSize="14sp"
+            android:textColor="#8B949E" />
+    </LinearLayout>
+
+    <!-- Info Box -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#1C2128"
+        android:padding="16dp"
+        android:layout_marginBottom="32dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ℹ️ Kaise kaam karta hai:"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#58A6FF"
+            android:layout_marginBottom="6dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="• Hotspot band hote hi timer shuru\n• 5 minute baad: Data + Hotspot ON\n• Har baar automatically hota hai\n• Phone restart ke baad bhi kaam karta hai"
+            android:textSize="13sp"
+            android:textColor="#8B949E"
+            android:lineSpacingExtra="4dp" />
+    </LinearLayout>
+
+    <!-- Start Button -->
+    <Button
+        android:id="@+id/btnStartService"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="▶ Guard Shuru Karo"
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#238636"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Stop Button -->
+    <Button
+        android:id="@+id/btnStopService"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="⏹ Guard Band Karo"
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#DA3633"
+        android:layout_marginBottom="12dp"
+        android:enabled="false" />
+
+    <!-- Open Hotspot Settings -->
+    <Button
+        android:id="@+id/btnOpenHotspot"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="⚙ Hotspot Settings Kholo"
+        android:textSize="14sp"
+        android:textColor="#58A6FF"
+        android:backgroundTint="#161B22" />
+
+</LinearLayout>
