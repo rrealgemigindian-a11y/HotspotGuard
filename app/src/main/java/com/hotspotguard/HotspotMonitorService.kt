@@ -5,8 +5,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.CountDownTimer
 import android.os.IBinder
@@ -19,11 +21,33 @@ class HotspotMonitorService : Service() {
         const val ACTION_STOP = "ACTION_STOP"
         const val NOTIFICATION_ID = 1001
         const val CHANNEL_ID = "hotspot_guard_channel"
-        const val DELAY_MS = 5 * 60 * 1000L  // 5 minutes in milliseconds
+        const val DELAY_MS = 2 * 60 * 1000L  // 2 minutes
     }
 
     private var countDownTimer: CountDownTimer? = null
     private var isWaitingToRestart = false
+
+    // Dynamic receiver — more reliable than manifest receiver on Android 8+
+    private val hotspotReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action != "android.net.wifi.WIFI_AP_STATE_CHANGED") return
+            if (!AppPreferences.isServiceEnabled(context)) return
+
+            val state = intent.getIntExtra("wifi_ap_state", -1)
+            when (state) {
+                10, 11 -> { // DISABLING, DISABLED
+                    if (!isWaitingToRestart) startCountdownToRestart()
+                }
+                12, 13 -> { // ENABLING, ENABLED
+                    if (isWaitingToRestart) {
+                        countDownTimer?.cancel()
+                        isWaitingToRestart = false
+                        updateNotification("🛡️ HotspotGuard Active — Monitoring chal raha hai")
+                    }
+                }
+            }
+        }
+    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -31,6 +55,16 @@ class HotspotMonitorService : Service() {
         super.onCreate()
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, buildNotification("🛡️ HotspotGuard chal raha hai..."))
+        registerHotspotReceiver()
+    }
+
+    private fun registerHotspotReceiver() {
+        val filter = IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(hotspotReceiver, filter, RECEIVER_EXPORTED)
+        } else {
+            registerReceiver(hotspotReceiver, filter)
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -45,25 +79,13 @@ class HotspotMonitorService : Service() {
                 AppPreferences.setServiceEnabled(this, false)
                 stopSelf()
             }
-            ACTION_HOTSPOT_OFF -> {
-                if (!isWaitingToRestart) {
-                    startCountdownToRestart()
-                }
-            }
-            ACTION_HOTSPOT_ON -> {
-                if (isWaitingToRestart) {
-                    countDownTimer?.cancel()
-                    isWaitingToRestart = false
-                    updateNotification("🛡️ HotspotGuard Active — Monitoring chal raha hai")
-                }
-            }
         }
         return START_STICKY
     }
 
-    fun startCountdownToRestart() {
+    private fun startCountdownToRestart() {
         isWaitingToRestart = true
-        updateNotification("⏳ Hotspot band hua — 5 minute mein on hoga...")
+        updateNotification("⏳ Hotspot band hua — 2 minute mein on hoga...")
 
         countDownTimer?.cancel()
         countDownTimer = object : CountDownTimer(DELAY_MS, 1000) {
@@ -83,10 +105,7 @@ class HotspotMonitorService : Service() {
     }
 
     private fun enableHotspotAndData() {
-        // Step 1: Enable mobile data
         MobileDataUtils.enableMobileData(this)
-
-        // Step 2: Enable hotspot (with small delay for data to connect)
         android.os.Handler(mainLooper).postDelayed({
             HotspotUtils.enableHotspot(this)
         }, 2000)
@@ -102,8 +121,7 @@ class HotspotMonitorService : Service() {
                 description = "Hotspot monitoring service"
                 setShowBadge(false)
             }
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
+            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
         }
     }
 
@@ -131,6 +149,7 @@ class HotspotMonitorService : Service() {
 
     override fun onDestroy() {
         countDownTimer?.cancel()
+        try { unregisterReceiver(hotspotReceiver) } catch (_: Exception) {}
         super.onDestroy()
     }
 }
