@@ -12,7 +12,7 @@
 
     <!-- Background service permissions -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Notification permission (Android 13+) -->
@@ -35,13 +35,13 @@
             </intent-filter>
         </activity>
 
-        <!-- Background monitoring service -->
+        <!-- Background monitoring service — dataSync type works without Bluetooth permission -->
         <service
             android:name=".HotspotMonitorService"
             android:exported="false"
-            android:foregroundServiceType="connectedDevice" />
+            android:foregroundServiceType="dataSync" />
 
-        <!-- Hotspot state change receiver -->
+        <!-- Hotspot state change receiver (static — backup for boot/killed state) -->
         <receiver
             android:name=".HotspotStateReceiver"
             android:exported="true">
