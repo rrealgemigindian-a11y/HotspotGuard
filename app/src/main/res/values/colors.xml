@@ -7,4 +7,5 @@
     <color name="surface_dark">#161B22</color>
     <color name="text_primary">#F0F6FC</color>
     <color name="text_secondary">#8B949E</color>
+    <color name="ic_launcher_background">#0D1117</color>
 </resources>
